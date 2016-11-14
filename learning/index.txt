@@ -41,3 +41,32 @@ OAuth 1.1a with Jersey
 -Create RESTful Web Service clients using the Jersey Client API
 -Understand the role of Web Services
 -Apply the JAX-WS API in the creation of SOAP Web Services and clients
+
+Java API for XML Web Services
+=============================
+https://en.wikipedia.org/wiki/Java_API_for_XML_Web_Services
+
+The Java API for XML Web Services (JAX-WS) is a Java programming language API for creating web services, 
+particularly SOAP services. JAX-WS is one of the Java XML programming APIs. It is part of the Java EE platform.
+
+The JAX-WS 2.2 specification JSR 224 defines a standard Java- to-WSDL mapping which determines how WSDL operations 
+are bound to Java methods when a SOAP message invokes a WSDL operation. This Java-to-WSDL mapping determines which 
+Java method gets invoked and how that SOAP message is mapped to the method’s parameters.
+
+JAX-WS uses annotations, introduced in Java SE 5, to simplify the development and deployment of web service clients and endpoints. 
+It is part of the Java Web Services Development Pack. JAX-WS can be used in Java SE starting with version 6.[1] 
+JAX-WS 2.0 replaced the JAX-RPC API in Java Platform, Enterprise Edition 5 which leans more towards document style Web Services.
+
+This API provides the core of Project Metro, inside the GlassFish open-source Application Server community of Oracle Corporation.
+
+JAX-WS also is one of the foundations of WSIT.
+
+Implementations
+
+Metro Project in GlassFish
+Apache CXF
+Apache Axis2
+JBossWS in JBoss
+IBM WebSphere Jax-Ws in WebSphere
+Oracle Weblogic
+
