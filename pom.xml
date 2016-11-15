@@ -8,6 +8,12 @@
 	<name>java-web-services-certification</name>
 	<description>Java Web Services en su maxima expresion</description>
 
+	<!-- DEPENDENCIES VERSION NUMBERS -->
+	<properties>
+		<jersey2.version>2.24</jersey2.version>
+	</properties>
+
+
 	<!-- DEPENDENCIES -->
 	<dependencies>
 
@@ -18,12 +24,40 @@
 			<version>2.2.11</version>
 		</dependency>
 
-		<!-- JSR 224: Metro Runtime Implementation--> 
+		<!-- SHIP IN JAVA EE -->
+		<!-- Metro: JAX-WS (JSR 224) Reference Implementation -->
 		<dependency>
 			<groupId>com.sun.xml.ws</groupId>
 			<artifactId>webservices-rt</artifactId>
 			<version>2.1-b16</version>
 		</dependency>
+
+		<!-- JAX-RS -->
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+
+		<!-- SHIP IN JAVA EE -->
+		<!-- Jersey: JAX-RS (JSR 311 & JSR 339) Reference Implementation -->
+		<dependency>
+		    <groupId>org.glassfish.jersey.containers</groupId>
+		    <artifactId>jersey-container-servlet</artifactId>
+		    <version>2.24</version>
+		</dependency>
+		
+		<dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>${jersey2.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${jersey2.version}</version>
+        </dependency>
 
 	</dependencies>
 

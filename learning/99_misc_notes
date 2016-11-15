@@ -8,3 +8,18 @@ In this approach, the service interface is created first and the implementation 
 2. Bottom-up approach
 In this approach, the service implementation is created first, and based on that the interface is defined. This approach is easy to for beginners who are new to web services.
 
+
+JSR 224:	Java API for XML Web Services 		(JAX-WS)
+JSR 311:	Java API for RESTful Web Services 	(JAX-RS 1.0) date 2008
+JSR 339: 	Java API for RESTful Web Services 	(JAX-RS 2.0) date 2013
+
+Before the JAX-RS specification there were frameworks like Restlet and RestEasy that 
+could help you implement the RESTful Web services, but they were not intuitive. 
+
+Jersey is the reference implementation for JAX-RS, and it contains three major parts.
+
+-Core Server: By providing annotations and APIs standardized in JSR 311, you can develop a RESTful Web service in a very intuitive way.
+-Core Client: The Jersey client API helps you to easily communicate with REST services.
+-Integration: Jersey also provides libraries that can easily integrate with Spring, Guice, Apache Abdera, and so on.
+
+

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <endpoints xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime"
+	schemaLocation="http://java.sun.com/xml/ns/jax-ws/ri/runtime 
+					http://java.sun.com/webservices/docs/2.0/jaxws/sun-jaxws.xsd"
 	version="2.0">
 
 	<endpoint name="WhateverName" implementation="a8.ws.soap.EightaSoapWs"
-		url-pattern="/eighta_soap_ws" />
+		url-pattern="/soap/eighta_soap_ws" />
 </endpoints>
