@@ -1,0 +1,55 @@
+Web Services Quickstart
+-----------------------
+
+Although the term web service has various, imprecise, and evolving meanings, a working
+definition should be enough for the upcoming code example, which consists of a service
+and a client, also known as a consumer or requester. As the name suggests, a web service
+is a kind of webified application—an application typically delivered over HTTP (Hy‐
+perText Transport Protocol). HTTPS (HTTP Secure) adds a security layer to HTTP;
+hence, a service delivered over HTTPS likewise counts as a web service. Until the main
+topic of interest is web service security, HTTP should be understood to include HTTPS.
+
+An HTTP request goes, by definition, from client to server, and an HTTP response goes,
+also by definition, from server to client. For web services over HTTP, the HTTP mes‐
+sages are the infrastructure, and these HTTP messages can be combined into basic
+conversational patterns that characterize a web service. For example, if the web service
+conversation starts with an HTTP request that expects an HTTP response, the pattern
+is the familiar request/response conversation. By contrast, if the conversation starts with
+an HTTP message from the server, a message that expects a message from the client in
+return, then the pattern is solicit/response. Richer conversational patterns can be com‐
+posed out of such basic two-message patterns. Indeed, these two-message patterns are
+composed of even more primitive ones: a message from client to server without a re‐
+sponse is a pattern known as one-way, and the reverse pattern, from server to client
+without a client response, is known as notification. Web services tend to be simple in
+structure. The four conversational patterns enumerated just now cover most modern
+web services, and request/response is the pattern that still dominates.
+
+Web services come in two popular flavors: SOAP-based and REST-style. SOAP is an
+XML dialect with a grammar that specifies the structure that a document must have in
+order to count as SOAP. In a typical SOAP-based service, the client sends SOAP messages
+to the service and the service responds in kind, with SOAP messages. REST-style services
+are hard to characterize in a sentence or two, but with respect to pattern, these services
+tend to be request/response; the same holds for SOAP-based services. For now, a REST-
+style service is one that treats HTTP not only as transport infrastructure but also as a
+set of guidelines for designing service requests and service responses. In a REST-style
+service, HTTP itself can be seen as an API. SOAP has standards, toolkits, and bountiful
+software libraries. REST has no official standards, comparatively few toolkits, and un‐
+even software libraries among programming languages. Yet there is growing support
+for REST-style services across programming languages; hence, it seems only a matter
+of time until toolkits and libraries for REST-style services mature.
+
+From a historical perspective, the RESTful approach to web services can be viewed as
+an antidote to the creeping complexity of SOAP-based web services. SOAP-based serv‐
+ices are designed to be transport-neutral; as a result, SOAP messaging may seem overly
+complicated if the transport is, in fact, HTTP.
+
+At present, the distinction
+between the two flavors of web service is not sharp, because a SOAP-based service
+delivered over HTTP can be seen as a special case of a REST-style service; HTTP remains
+the dominant transport for SOAP-based services.
+
+SOAP originally stood for Simple Object Access Protocol and then, by serendipity but
+never officially, might have stood for Service-Oriented Architecture (SOA) Protocol.
+(SOA is discussed in the section “Web Services and Service-Oriented Architecture” on
+page 7.) The World Wide Web Consortium (hereafter, W3C) currently oversees SOAP,
+and SOAP is officially no longer an acronym.
