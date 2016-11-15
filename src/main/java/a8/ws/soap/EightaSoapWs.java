@@ -4,7 +4,8 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 @WebService
-public class MySoapWsImpl implements MySoapWs{
+public class EightaSoapWs
+{
 
 	@WebMethod
 	public String businessMethod(){

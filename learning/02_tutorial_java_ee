@@ -207,7 +207,139 @@ operation.
 -@WebService
 -@WebMethod
 
-page 371
+NOTA IMPORTANTE
+===============
+Cuando se crea un WebService de la forma anterior (con una clase)
+Los end points quedan de la siguiente forma:
+
+Service Name:	[class name] + "Service"
+Port Name:		[class name] + "Port"
+
+A Simple JAX-WS Application Client
+==================================
+
+The HelloAppClient class is a stand-alone application client that accesses the sayHello
+method of HelloService. This call is made through a port, a local object that acts as a proxy for
+the remote service. The port is created at development time by the wsimport task, which
+generates JAX-WS portable artifacts based on a WSDL file.
+
+the wsimport task
+->appclient.jar
+->webclient.war
+
+
+Types Supported by JAX-WS
+=========================
+
+JAX-WS delegates the mapping of Java programming language types to and from XML
+definitions to JAXB. Application developers don’t need to know the details of these mappings
+but should be aware that not every class in the Java language can be used as a method parameter
+or return type in JAX-WS.
+
+The following sections explain the default schema-to-Java and Java-to-schema data type
+bindings.
+
+Schema-to-Java Mapping
+The Java language provides a richer set of data type than XML schema. Table 19–1 lists the
+mapping of XML data types to Java data types in JAXB.
+
+XML SchemaType Java DataType
+xsd:string java.lang.String
+xsd:integer java.math.BigInteger
+xsd:int int
+xsd.long long
+xsd:short short
+xsd:decimal java.math.BigDecimal
+xsd:float float
+xsd:double double
+xsd:boolean boolean
+xsd:byte
+MAS... PAGINA 377
+
+Web Services Interoperability and JAX-WS
+========================================
+
+JAX-WS supports the Web Services Interoperability (WS-I) Basic Profile Version 1.1. The WS-I
+Basic Profile is a document that clarifies the SOAP 1.1 andWSDL 1.1 specifications to promote
+SOAP interoperability.
+
+To support WS-I Basic Profile Version 1.1, the JAX-WS runtime supports doc/literal and
+rpc/literal encodings for services, static ports, dynamic proxies, and theDynamic Invocation
+Interface (DII).
+
+Further Information about JAX-WS
+For more information about JAX-WS and related technologies, see
+ Java API for XML Web Services 2.2 specification:
+http://jcp.org/aboutJava/communityprocess/mrel/jsr224/index4.html
+ JAX-WS home:
+http://jax-ws.java.net/
+ Simple Object Access Protocol (SOAP) 1.2 W3CNote:
+http://www.w3.org/TR/soap/
+ Web ServicesDescription Language (WSDL) 1.1 W3CNote:
+http://www.w3.org/TR/wsdl
+ WS-I Basic Profile 1.1:
+http://www.ws-i.org
+
+
+RESTfulWeb Services with JAX-RS
+===============================
+This chapter describes the REST architecture, RESTful web services, and the Java API for
+RESTful Web Services (JAX-RS, defined in JSR 311).
+
+Jersey, the reference implementation of JAX-RS, implements support for the annotations
+defined in JSR 311, making it easy for developers to build RESTful web services by using the Java
+programming language.
+
+What Are RESTfulWeb Services?
+
+RESTful web services are built to work best on the Web. Representational State Transfer (REST)
+is an architectural style that specifies constraints, such as the uniform interface, that if applied to
+a web service induce desirable properties, such as performance, scalability, and modifiability,
+that enable services to work best on the Web. In the REST architectural style, data and
+functionality are considered resources and are accessed using Uniform Resource Identifiers
+(URIs), typically links on the Web. The resources are acted upon by using a set of simple,
+well-defined operations. The REST architectural style constrains an architecture to a
+client/server architecture and is designed to use a stateless communication protocol, typically
+HTTP. In the REST architecture style, clients and servers exchange representations of resources
+by using a standardized interface and protocol.
+
+The following principles encourage RESTful applications to be simple, lightweight, and fast:
+
+ Resource identification through URI: A RESTful web service exposes a set of resources
+that identify the targets of the interaction with its clients. Resources are identified by URIs,
+which provide a global addressing space for resource and service discovery. See “The @Path
+Annotation and URI Path Templates” on page 385 for more information.
+
+ Uniform interface: Resources are manipulated using a fixed set of four create, read, update,
+delete operations: PUT, GET, POST, and DELETE. PUT creates a new resource, which can be then
+deleted by using DELETE. GET retrieves the current state of a resource in some representation.
+POST transfers a new state onto a resource. See “Responding to HTTPMethods and
+Requests” on page 387 for more information.
+
+ Self-descriptive messages: Resources are decoupled from their representation so that their
+content can be accessed in a variety of formats, such as HTML, XML, plain text, PDF, JPEG,
+JSON, and others.Metadata about the resource is available and used, for example, to control
+caching, detect transmission errors, negotiate the appropriate representation format, and
+perform authentication or access control. See “Responding to HTTPMethods and
+Requests” on page 387 and “Using Entity Providers toMap HTTP Response and Request
+Entity Bodies” on page 389 for more information.
+
+ Stateful interactions through hyperlinks: Every interaction with a resource is stateless; that
+is, request messages are self-contained. Stateful interactions are based on the concept of
+explicit state transfer. Several techniques exist to exchange state, such as URI rewriting,
+cookies, and hidden form fields. State can be embedded in response messages to point to
+valid future states of the interaction. See “Using Entity Providers toMap HTTP Response
+and Request Entity Bodies” on page 389 and “Building URIs” in the JAX-RSOverview
+document for more information.
+
+
+
+
+
+
+
+
+page 382
 
 
 //guias de primera implemenetacion

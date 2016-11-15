@@ -1,0 +1,10 @@
+https://dzone.com/articles/working-jax-ws-web-services
+
+A web service can be developed in two methods,
+
+-1. Top-down approach
+In this approach, the service interface is created first and the implementation is provided at later point.
+
+2. Bottom-up approach
+In this approach, the service implementation is created first, and based on that the interface is defined. This approach is easy to for beginners who are new to web services.
+

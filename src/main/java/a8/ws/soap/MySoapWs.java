@@ -1,12 +1,10 @@
 package a8.ws.soap;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-
-@WebService
+//@WebService
+@Deprecated
 public interface MySoapWs {
 
-	@WebMethod
+	//@WebMethod
 	public String businessMethod();
 	
 }

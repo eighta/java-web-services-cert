@@ -10,7 +10,8 @@
 	</welcome-file-list>
 	
 	
-	<!--  -->
+	<!-- PARA SOPORTAR WEB-SERVICES EN WebContainers (TOMCAT) que no implmenetan 
+			The JAX-WS 2.2 specification JSR 224 -->
 	<listener>
         <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
 	</listener>
@@ -22,9 +23,8 @@
 	</servlet>
 	<servlet-mapping>
 	        <servlet-name>wxyz</servlet-name>
-	        <url-pattern>/the_soap_ws</url-pattern>
+	        <url-pattern>/eighta_soap_ws</url-pattern>
 	</servlet-mapping>
-	
-	<!--  -->
+	<!-- END  -->
 	
 </web-app>
