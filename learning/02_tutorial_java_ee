@@ -466,21 +466,854 @@ uppercase or lowercase letter and zero or more alphanumeric characters and the u
 character. If a user name does not match that template, a 404 (Not Found) response will be sent
 to the client.
 
+A @Path value isn’t required to have leading or trailing slashes (/). The JAX-RS runtime parses
+URI path templates the same whether or not they have leading or trailing spaces
+
+A URI path template has one or more variables, with each variable name surrounded by braces:
+{ to begin the variable name and } to end it. In the preceding example, username is the variable
+name. At runtime, a resource configured to respond to the preceding URI path template will
+attempt to process the URI data that corresponds to the location of {username} in the URI as
+the variable data for username.
+
+Responding to HTTP Methods and Requests
+---------------------------------------
+The behavior of a resource is determined by the HTTP methods (typically, GET, POST, PUT,
+DELETE) to which the resource is responding.
+
+The Request Method Designator Annotations
+
+Request method designator annotations are runtime annotations, defined by JAX-RS, that
+correspond to the similarly named HTTP methods. Within a resource class file, HTTP methods
+are mapped to Java programming language methods by using the request method designator
+annotations. The behavior of a resource is determined by which HTTP method the resource is
+responding to. JAX-RS defines a set of request method designators for the common HTTP
+methods @GET, @POST, @PUT, @DELETE, and @HEAD; you can also create your own custom request
+method designators. Creating custom request method designators is outside the scope of this
+document.
+
+By default, the JAX-RS runtime will automatically support the methods HEAD and OPTIONS if not
+explicitly implemented. For HEAD, the runtime will invoke the implemented GET method, if
+present, and ignore the response entity, if set. For OPTIONS, the Allow response header will be
+set to the set of HTTP methods supported by the resource. In addition, the JAX-RS runtime will
+return a Web Application Definition Language (WADL) document describing the resource; see
+http://www.w3.org/Submission/wadl/ for more information.
+
+Methods decorated with request method designators must return void, a Java programming
+language type, or a javax.ws.rs.core.Response object. Multiple parameters may be extracted
+from the URI by using the @PathParam or @QueryParam annotations as described in “Extracting
+Request Parameters” on page 392. Conversion between Java types and an entity body is the
+responsibility of an entity provider, such as MessageBodyReader or MessageBodyWriter.
+Methods that need to provide additional metadata with a response should return an instance of
+the Response class. The ResponseBuilder class provides a convenient way to create a Response
+instance using a builder pattern. The HTTP PUT and POST methods expect an HTTP request
+body, so you should use a MessageBodyReader for methods that respond to PUT and POST
+requests.
+
+Both @PUT and @POST can be used to create or update a resource. POST can mean anything, so
+when using POST, it is up to the application to define the semantics. PUT has well-defined
+semantics. When using PUT for creation, the client declares the URI for the newly created
+resource.
+
+PUT has very clear semantics for creating and updating a resource. The representation the client
+sends must be the same representation that is received using a GET, given the same media type.
+PUT does not allow a resource to be partially updated, a common mistake when attempting to
+use the PUT method. A common application pattern is to use POST to create a resource and
+return a 201 response with a location header whose value is the URI to the newly created
+resource. In this pattern, the web service declares the URI for the newly created resource.
+
+Using Entity Providers to Map HTTP Response and Request Entity Bodies
+---------------------------------------------------------------------
+
+Entity providers supply mapping services between representations and their associated Java
+types. The two types of entity providers are MessageBodyReader and MessageBodyWriter. For
+HTTP requests, the MessageBodyReader is used to map an HTTP request entity body to
+method parameters. On the response side, a return value is mapped to an HTTP response entity
+body by using a MessageBodyWriter. If the application needs to supply additional metadata,
+such as HTTP headers or a different status code, a method can return a Response that wraps the
+entity and that can be built by using Response.ResponseBuilder.
+
+Next table shows the standard types that are supported automatically for HTTP request and
+response entity bodies. You need to write an entity provider only if you are not choosing one of
+these standard types.
+
+Java Type Supported Media Types
+byte[] All media types (*/*)
+java.lang.String All text media types (text/*)
+java.io.InputStream All media types (*/*)
+java.io.Reader All media types (*/*)
+java.io.File All media types (*/*)
+javax.activation.DataSource All media types (*/*)
+javax.xml.transform.Source XML media types (text/xml, application/xml, and
+application/*+xml)
+javax.xml.bind.JAXBElement and
+application-supplied JAXB classes XML media types (text/xml, application/xml, and
+application/*+xml)
+MultivaluedMap<String, String> Form content
+(application/x-www-form-urlencoded)
+StreamingOutput All media types (*/*), MessageBodyWriter only
 
 
+Using @Consumes and @Produces to Customize Requests and Responses
+-----------------------------------------------------------------
+
+The information sent to a resource and then passed back to the client is specified as a MIME
+media type in the headers of an HTTP request or response. You can specify which MIME media
+types of representations a resource can respond to or produce by using the following
+annotations:
+-javax.ws.rs.Consumes
+-javax.ws.rs.Produces
+
+By default, a resource class can respond to and produce all MIME media types of
+representations specified in the HTTP request and response headers.
+
+The @Produces Annotation
+------------------------
+The @Produces annotation is used to specify the MIME media types or representations a
+resource can produce and send back to the client. If @Produces is applied at the class level, all
+the methods in a resource can produce the specified MIME types by default. If applied at the
+method level, the annotation overrides any @Produces annotations applied at the class level.
+
+If no methods in a resource are able to produce the MIME type in a client request, the JAX-RS
+runtime sends back an HTTP “406 Not Acceptable” error.
+
+The value of @Produces is an array of String of MIME types. For example:
+@Produces({"image/jpeg,image/png"})
 
 
+If a resource class is capable of producing more than one MIME media type, the resource
+method chosen will correspond to the most acceptable media type as declared by the client.
+More specifically, the Accept header of the HTTP request declares what is most acceptable. For
+example, if the Accept header is Accept: text/plain, the doGetAsPlainText method will be
+invoked. Alternatively, if the Accept header is Accept: text/plain;q=0.9, text/html, which
+declares that the client can accept media types of text/plain and text/html but prefers the
+latter, the doGetAsHtml method will be invoked.
+
+More than one media type may be declared in the same @Produces declaration. The following
+code example shows how this is done:
+
+@Produces({"application/xml", "application/json"})
+public String doGetAsXmlOrJson() {
+	...
+}
+
+The doGetAsXmlOrJson method will get invoked if either of the media types application/xml
+and application/json is acceptable. If both are equally acceptable, the former will be chosen
+because it occurs first. The preceding examples refer explicitly to MIME media types for clarity.
+It is possible to refer to constant values, which may reduce typographical errors. For more
+information, see the constant field values of MediaType at http://jsr311.java.net/nonav/
+releases/1.0/javax/ws/rs/core/MediaType.html.
+
+The @Consumes Annotation
+------------------------
+The @Consumes annotation is used to specify which MIME media types of representations a
+resource can accept, or consume, from the client. If @Consumes is applied at the class level, all the
+response methods accept the specified MIME types by default. If applied at the method level,
+@Consumes overrides any @Consumes annotations applied at the class level.
+
+If a resource is unable to consume the MIME type of a client request, the JAX-RS runtime sends
+back an HTTP 415 (“Unsupported Media Type”) error.
+
+The value of @Consumes is an array of String of acceptable MIME types. For example:
+@Consumes({"text/plain,text/html"})
+
+@Path("/myResource")
+@Consumes("multipart/related")
+public class SomeResource {
+	@POST
+	public String doPost(MimeMultipart mimeMultipartData) {
+		...
+	}
+	
+	@POST
+	@Consumes("application/x-www-form-urlencoded")
+	public String doPost2(FormURLEncodedProperties formData) {
+		...
+	}
+}
+
+The doPost method defaults to the MIME media type of the @Consumes annotation at the class
+level. The doPost2 method overrides the class level @Consumes annotation to specify that it can
+accept URL-encoded form data.
+
+If no resource methods can respond to the requested MIME type, an HTTP 415 (“Unsupported
+Media Type”) error is returned to the client.
+
+The HelloWorld example discussed previously in this section can be modified to set the
+message by using @Consumes, as shown in the following code example:
+
+@POST
+@Consumes("text/plain")
+public void postClichedMessage(String message) {
+	// Store the message
+}
+In this example, the Java method will consume representations identified by the MIME media
+type text/plain. Note that the resource method returns void. This means that no
+representation is returned and that a response with a status code of HTTP 204 (“No Content”)
+will be returned.
+
+Extracting Request Parameters
+-----------------------------
+
+Parameters of a resource method may be annotated with parameter-based annotations to
+extract information from a request. A previous example presented the use of the @PathParam
+parameter to extract a path parameter from the path component of the request URL that
+matched the path declared in @Path.
+
+You can extract the following types of parameters for use in your resource class:
+-Query
+-URI path
+-Form
+-Cookie
+-Header
+-Matrix
+
+Query parameters are extracted from the request URI query parameters and are specified by
+using the javax.ws.rs.QueryParam annotation in the method parameter arguments. The
+following example, from the sparklines sample application, demonstrates using @QueryParam
+to extract query parameters from the Query component of the request URL:
+
+@Path("smooth")
+@GET
+public Response smooth(
+	@DefaultValue("2") @QueryParam("step") int step,
+	@DefaultValue("true") @QueryParam("min-m") boolean hasMin,
+	@DefaultValue("true") @QueryParam("max-m") boolean hasMax,
+	@DefaultValue("true") @QueryParam("last-m") boolean hasLast,
+	@DefaultValue("blue") @QueryParam("min-color") ColorParam minColor,
+	@DefaultValue("green") @QueryParam("max-color") ColorParam maxColor,
+	@DefaultValue("red") @QueryParam("last-color") ColorParam lastColor
+) { ... }
 
 
+If the query parameter step exists in the query component of the request URI, the value of step
+will be extracted and parsed as a 32-bit signed integer and assigned to the step method
+parameter. If step does not exist, a default value of 2, as declared in the @DefaultValue
+annotation, will be assigned to the step method parameter. If the step value cannot be parsed
+as a 32-bit signed integer, an HTTP 400 (“Client Error”) response is returned.
+
+Both @QueryParam and @PathParam can be used only on the following Java types:
+
+- All primitive types except char
+- All wrapper classes of primitive types except Character
+- Any class with a constructor that accepts a single String argument
+- Any class with the static method named valueOf(String) that accepts a single String
+argument
+- List<T>, Set<T>, or SortedSet<T>, where T matches the already listed criteria. Sometimes,
+parameters may contain more than one value for the same name. If this is the case, these
+types may be used to obtain all values
+
+If @DefaultValue is not used in conjunction with @QueryParam, and the query parameter is not
+present in the request, the value will be an empty collection for List, Set, or SortedSet; null for
+other object types; and the default for primitive types.
+
+URI path parameters
+-------------------
+URI path parameters are extracted from the request URI, and the parameter names correspond
+to the URI path template variable names specified in the @Path class-level annotation. URI
+parameters are specified using the javax.ws.rs.PathParam annotation in the method
+parameter arguments. The following example shows how to use @Path variables and the
+@PathParam annotation in a method:
+
+@Path("/{username}")
+public class MyResourceBean {
+	...
+	@GET
+	public String printUsername(@PathParam("username") String userId) {
+		...
+	}
+}
+
+In the preceding snippet, the URI path template variable name username is specified as a
+parameter to the printUsername method. The @PathParam annotation is set to the variable
+name username. At runtime, before printUsername is called, the value of username is extracted
+from the URI and cast to a String. The resulting String is then available to the method as the
+userId variable.
+
+If the URI path template variable cannot be cast to the specified type, the JAX-RS runtime
+returns an HTTP 400 (“Bad Request”) error to the client. If the @PathParam annotation cannot
+be cast to the specified type, the JAX-RS runtime returns an HTTP 404 (“Not Found”) error to
+the client.
+
+The @PathParam parameter and the other parameter-based annotations (@MatrixParam,
+@HeaderParam, @CookieParam, and @FormParam) obey the same rules as @QueryParam.
+
+Other's parameters
+-----------------
+Cookie parameters, indicated by decorating the parameter with javax.ws.rs.CookieParam,
+extract information from the cookies declared in cookie-related HTTP headers. Header
+parameters, indicated by decorating the parameter with javax.ws.rs.HeaderParam, extract
+information from the HTTP headers. Matrix parameters, indicated by decorating the parameter
+with javax.ws.rs.MatrixParam, extract information from URL path segments.
+
+Form parameters, indicated by decorating the parameter with javax.ws.rs.FormParam, extract
+information from a request representation that is of the MIME media type
+application/x-www-form-urlencoded and conforms to the encoding specified by HTML
+forms, as described in http://www.w3.org/TR/html401/interact/
+forms.html#h-17.13.4.1. This parameter is very useful for extracting information sent by
+POST in HTML forms.
+
+The following example extracts the name form parameter from the POST form data:
+@POST
+@Consumes("application/x-www-form-urlencoded")
+public void post(@FormParam("name") String name) {
+	// Store the message
+}
 
 
+To obtain a general map of parameter names and values for query and path parameters, use the
+following code:
+@GET
+public String get(@Context UriInfo ui) {
+	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+	MultivaluedMap<String, String> pathParams = ui.getPathParameters();
+}
+
+The following method extracts header and cookie parameter names and values into a map:
+@GET
+public String get(@Context HttpHeaders hh) {
+	MultivaluedMap<String, String> headerParams = hh.getRequestHeaders();
+	Map<String, Cookie> pathParams = hh.getCookies();
+}
+
+In general, @Context can be used to obtain contextual Java types related to the request or
+response.
+
+For form parameters, it is possible to do the following:
+@POST
+@Consumes("application/x-www-form-urlencoded")
+public void post(MultivaluedMap<String, String> formParams) {
+	// Store the message
+}
+
+Further Information about JAX-RS
+================================
+For more information about RESTful web services and JAX-RS, see
+
+“RESTful Web Services vs. ’Big’ Web Services: Making the Right Architectural Decision”:
+http://www2008.org/papers/pdf/p805-pautassoA.pdf
+
+“Fielding Dissertation: Chapter 5: Representational State Transfer (REST)”:
+http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm
+
+ RESTful Web Services, by Leonard Richardson and Sam Ruby, available from O’Reilly Media
+at http://oreilly.com/catalog/9780596529260/
+
+ JSR 311: JAX-RS: The Java API for RESTful Web Services:
+http://jcp.org/en/jsr/detail?id=311
+
+JAX-RS project:
+http://jsr311.java.net/
+
+Jersey project:
+http://jersey.java.net/
+
+JAX-RS: Advanced Topics
+=======================
+
+JAX-RS is part of the Java EE 6 full profile. JAX-RS is integrated with Contexts and Dependency
+Injection for the Java EE Platform (CDI), Enterprise JavaBeans (EJB) technology, and Java
+Servlet technology.
+
+Annotations for Field and Bean Properties of Resource Classes
+-------------------------------------------------------------
+
+JAX-RS annotations for resource classes let you extract specific parts or values from a Uniform
+Resource Identifier (URI) or request header.
+
+JAX-RS provides the annotations listed in next table
+
+Annotation Description
+@Context Injects information into a class field, bean property, or method parameter
+@CookieParam Extracts information from cookies declared in the cookie request header
+@FormParam Extracts information from a request representation whose content type is
+application/x-www-form-urlencoded
+@HeaderParam Extracts the value of a header
+@MatrixParam Extracts the value of a URI matrix parameter
+@PathParam Extracts the value of a URI template parameter
+@QueryParam Extracts the value of a URI query parameter
+
+Integrating JAX-RS with EJB Technology and CDI
+----------------------------------------------
+
+AX-RS works with Enterprise JavaBeans technology (enterprise beans) and Contexts and
+Dependency Injection for the Java EE Platform (CDI).
+In general, for JAX-RS to work with enterprise beans, you need to annotate the class of a bean
+with @Path to convert it to a root resource class. You can use the @Path annotation with stateless
+session beans and singleton POJO beans.
+
+The following code snippet shows a stateless session bean and a singleton bean that have been
+converted to JAX-RS root resource classes.
+
+@Stateless
+@Path("stateless-bean")
+public class StatelessResource {...}
+
+@Singleton
+@Path("singleton-bean")
+public class SingletonResource {...}
+
+Session beans can also be used for subresources.
+JAX-RS and CDI have slightly different component models. By default, JAX-RS root resource
+classes are managed in the request scope, and no annotations are required for specifying the
+scope. CDI managed beans annotated with @RequestScoped or @ApplicationScoped can be
+converted to JAX-RS resource classes.
+
+The following code snippet shows a JAX-RS resource class.
+@Path("/employee/{id}")
+public class Employee {
+public Employee(@PathParam("id") String id) {...}
+}
+@Path("{lastname}")
+public final class EmpDetails {...}
+
+The following code snippet shows this JAX-RS resource class converted to a CDI bean. The
+beans must be proxyable, so the Employee class requires a non-private constructor with no
+parameters, and the EmpDetails class must not be final.
+
+@Path("/employee/{id}")
+@RequestScoped
+public class Employee {
+public Employee() {...}
+@Inject
+public Employee(@PathParam("id") String id) {...}
+}
+@Path("{lastname}")
+@RequestScoped
+public class EmpDetails {...}
 
 
+Conditional HTTP Requests
+-------------------------
+
+JAX-RS provides support for conditional GET and PUT HTTP requests. Conditional GET
+requests help save bandwidth by improving the efficiency of client processing.
+
+A GET request can return a Not Modified (304) response if the representation has not changed
+since the previous request. For example, a web site can return 304 responses for all its static
+images that have not changed since the previous request.
+
+A PUT request can return a Precondition Failed (412) response if the representation has been
+modified since the last request. The conditional PUT can help avoid the lost update problem.
+
+Conditional HTTP requests can be used with the Last-Modified and ETag headers. The
+Last-Modified header can represent dates with granularity of one second.
+
+@Path("/employee/{joiningdate}")
+public class Employee {
+
+	Date joiningdate;
+
+	@GET
+	@Produces("application/xml")
+	public Employee(
+		@PathParam("joiningdate") Date joiningdate,
+		@Context Request req,
+		@Context UriInfo ui) {
+		
+		this.joiningdate = joiningdate;
+		...
+		this.tag = computeEntityTag(ui.getRequestUri());
+		if (req.getMethod().equals("GET")) {
+			Response.ResponseBuilder rb = req.evaluatePreconditions(tag);
+			if (rb != null) {
+				throw new WebApplicationException(rb.build());
+			}
+		}
+	}
+}
+
+In this code snippet, the constructor of the Employee class computes the entity tag from the
+request URI and calls the request.evaluatePreconditions method with that tag. If a client
+request returns an If-none-match header with a value that has the same entity tag that was
+computed, evaluate.Preconditions returns a pre-filled-out response with a 304 status code
+and an entity tag set that may be built and returned.
+
+Runtime Content Negotiation
+---------------------------
+The @Produces and @Consumes annotations handle static content negotiation in JAX-RS. These
+annotations specify the content preferences of the server. HTTP headers such as Accept,
+Content-Type, and Accept-Language define the content negotiation preferences of the client.
+
+For more details on the HTTP headers for content negotiation, see HTTP /1.1 - Content
+Negotiation (http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html).
+
+The following code snippet shows the server content preferences:
+@Produces("text/plain")
+@Path("/employee")
+public class Employee {
+
+	@GET
+	public String getEmployeeAddressText(String address) { ... }
+
+	@Produces("text/xml")
+	@GET
+	public String getEmployeeAddressXml(Address address) { ... }
+}
+
+The getEmployeeAddressText method is called for an HTTP request that looks as follows:
+GET /employee
+Accept: text/plain
+
+This will produce the following response:
+500 Oracle Parkway, Redwood Shores, CA
+
+The getEmployeeAddressXml method is called for an HTTP request that looks as follows:
+GET /employee
+Accept: text/xml
+
+This will produce the following response:
+<address street="500 Oracle Parkway, Redwood Shores, CA" country="USA"/>
+
+With static content negotiation, you can also define multiple content and media types for the
+client and server.
+
+@Produces("text/plain", "text/xml")
+
+Variant
+-------
+
+In addition to supporting static content negotiation, JAX-RS also supports runtime content
+negotiation using the javax.ws.rs.core.Variant class and Request objects. The Variant
+class specifies the resource representation of content negotiation. Each instance of the Variant
+class may contain a media type, a language, and an encoding. The Variant object defines the
+resource representation that is supported by the server. The Variant.VariantListBuilder
+class is used to build a list of representation variants.
+
+The following code snippet shows how to create a list of resource representation variants:
+List<Variant> vs = Variant.mediatypes("application/xml", "application/json").languages("en", "fr").build();
+
+This code snippet calls the build method of the VariantListBuilder class. The
+VariantListBuilder class is invoked when you call the mediatypes, languages, or encodings
+methods. The build method builds a series of resource representations. The Variant list
+created by the build method has all possible combinations of items specified in the
+mediatypes, languages, and encodings methods.
+
+The javax.ws.rs.core.Request.selectVariant method accepts a list of Variant objects and
+chooses the Variant object that matches the HTTP request. This method compares its list of
+Variant objects with the Accept, Accept-Encoding, Accept-Language, and Accept-Charset
+headers of the HTTP request.
+
+The following code snippet shows how to use the selectVariant method to select the most
+acceptable Variant from the values in the client request.
+@GET
+public Response get(@Context Request r) {
+	List<Variant> vs = ...;
+	Variant v = r.selectVariant(vs);
+	if (v == null) {
+		return Response.notAcceptable(vs).build();
+	} else {
+		Object rep = selectRepresentation(v);
+		return Response.ok(rep, v);
+	}
+}
+
+The selectVariant method returns the Variant object that matches the request, or null if no
+matches are found. In this code snippet, if the method returns null, a Response object for a
+non-acceptable response is built. Otherwise, a Response object with an OK status and
+containing a representation in the form of an Object entity and a Variant is returned.
 
 
+Using JAX-RS With JAXB
+----------------------
+Java Architecture for XML Binding (JAXB) is an XML-to-Java binding technology that
+simplifies the development of web services by enabling transformations between schema and
+Java objects and between XML instance documents and Java object instances. An XML schema
+defines the data elements and structure of an XML document. You can use JAXB APIs and tools
+to establish mappings between Java classes and XML schema. JAXB technology provides the
+tools that enable you to convert your XML documents to and from Java objects.
+
+By using JAXB, you can manipulate data objects in the following ways:
+
+-You can start with an XML schema definition (XSD) and use xjc, the JAXB schema
+compiler tool, to create a set of JAXB-annotated Java classes that map to the elements and
+types defined in the XSD schema.
+
+-You can start with a set of Java classes and use schemagen, the JAXB schema generator tool,
+to generate an XML schema.
+
+-Once a mapping between the XML schema and the Java classes exists, you can use the JAXB
+binding runtime to marshal and unmarshal your XML documents to and from Java objects
+and use the resulting Java classes to assemble a web services application.
+
+XML is a common media format that RESTful services consume and produce. To deserialize
+and serialize XML, you can represent requests and responses by JAXB annotated objects. Your
+JAX-RS application can use the JAXB objects to manipulate XML data. JAXB objects can be
+used as request entity parameters and response entities. The JAX-RS runtime environment
+includes standard MessageBodyReader and MessageBodyWriter provider interfaces for reading
+and writing JAXB objects as entities.
+
+With JAX-RS, you enable access to your services by publishing resources. Resources are just
+simple Java classes with some additional JAX-RS annotations. These annotations express the
+following:
+
+-The path of the resource (the URL you use to access it)
+
+-The HTTP method you use to call a certain method (for example, the GET or POST method)
+
+-The MIME type with which a method accepts or responds
+
+As you define the resources for your application, consider the type of data you want to expose.
+You may already have a relational database that contains information you want to expose to
+users, or you may have static content that does not reside in a database but does need to be
+distributed as resources. Using JAX-RS, you can distribute content from multiple sources.
+RESTful web services can use various types of input/output formats for request and response.
+The customer example, described in “The customer Example Application” on page 418, uses
+XML.
+
+Resources have representations. A resource representation is the content in the HTTP message
+that is sent to, or returned from, the resource using the URI. Each representation a resource
+supports has a corresponding media type. For example, if a resource is going to return content
+formatted as XML, you can use application/xml as the associated media type in the HTTP
+message. Depending on the requirements of your application, resources can return
+representations in a preferred single format or in multiple formats. JAX-RS provides @Consumes
+and @Produces annotations to declare the media types that are acceptable for a resource
+method to read and write.
+
+JAX-RS also maps Java types to and from resource representations using entity providers. A
+MessageBodyReader entity provider reads a request entity and deserializes the request entity
+into a Java type. A MessageBodyWriter entity provider serializes from a Java type into a
+response entity. For example, if a String value is used as the request entity parameter, the
+MessageBodyReader entity provider deserializes the request body into a new String. If a JAXB
+type is used as the return type on a resource method, the MessageBodyWriter serializes the
+JAXB object into a response body.
+
+By default, the JAX-RS runtime environment attempts to create and use a default JAXBContext
+class for JAXB classes. However, if the default JAXBContext class is not suitable, then you can
+supply a JAXBContext class for the application using a JAX-RS ContextResolver provider
+interface.
+
+Using Java Objects to Model Your Data
+-------------------------------------
+If you do not have an XML schema definition for the data you want to expose, you can model
+your data as Java classes, add JAXB annotations to these classes, and use JAXB to generate an
+XML schema for your data. For example, if the data you want to expose is a collection of
+products and each product has an ID, a name, a description, and a price, you can model it as a
+Java class as follows:
+
+@XmlRootElement(name="product")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Product {
+
+	@XmlElement(required=true)
+	protected int id;
+
+	@XmlElement(required=true)
+	protected String name;
+
+	@XmlElement(required=true)
+	protected String description;
+
+	@XmlElement(required=true)
+	protected int price;
+	
+	public Product() {}
+
+	// Getter and setter methods
+	// ...
+}
 
 
-page 382
+Run the JAXB schema generator on the command line to generate the corresponding XML
+schema definition:
+
+$ schemagen Product.java
+
+This command produces the XML schema as an .xsd file:
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	
+	<xs:element name="product" type="product"/>
+	
+	<xs:complexType name="product">
+		<xs:sequence>
+				<xs:element name="id" type="xs:int"/>
+				<xs:element name="name" type="xs:string"/>
+				<xs:element name="description" type="xs:string"/>
+				<xs:element name="price" type="xs:int"/>
+		</xs:sequence>
+	<xs:complexType>
+
+</xs:schema>
+
+Once you have this mapping, you can create Product objects in your application, return them,
+and use them as parameters in JAX-RS resource methods. The JAX-RS runtime uses JAXB to
+convert the XML data from the request into a Product object and to convert a Product object
+into XML data for the response. The following resource class provides a simple example:
+
+
+@Path("/product")
+public class ProductService {
+
+	@GET
+	@Path("/get")
+	@Produces("application/xml")
+	public Product getProduct() {
+		Product prod = new Product();
+		prod.setId(1);
+		prod.setName("Mattress");
+		prod.setDescription("Queen size mattress");
+		prod.setPrice(500);
+		return prod;
+	}
+	
+	@POST
+	@Path("/create")
+	@Consumes("application/xml")
+	public Response createProduct(Product prod) {
+		// Process or store the product and return a response
+		// ...
+	}
+}
+
+Starting from an Existing XML Schema Definition
+-----------------------------------------------
+If you already have an XML schema definition in an .xsd file for the data you want to expose,
+use the JAXB schema compiler tool. Consider this simple example of an .xsd file:
+
+<?xml version="1.0"?>
+<xs:schema targetNamespace="http://xml.product"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+	xmlns:myco="http://xml.product">
+
+	<xs:element name="product" type="myco:Product"/>
+	
+	<xs:complexType name="Product">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int"/>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="description" type="xs:string"/>
+			<xs:element name="price" type="xs:int"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
+
+
+Run the schema compiler tool on the command line as follows:
+$ xjc Product.xsd
+
+This command generates the source code for Java classes that correspond to the types defined in
+the .xsd file. The schema compiler tool generates a Java class for each complexType defined in
+the .xsd file. The fields of each generated Java class are the same as the elements inside the
+corresponding complexType, and the class contains getter and setter methods for these fields.
+
+In this case the schema compiler tool generates the classes product.xml.Product and
+product.xml.ObjectFactory. The Product class contains JAXB annotations, and its fields
+correspond to those in the .xsd definition:
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "Product", propOrder = {"id","name","description","price"})
+public class Product {
+
+	protected int id;
+
+	@XmlElement(required = true)
+	protected String name;
+	
+	@XmlElement(required = true)
+	protected String description;
+	
+	protected int price;
+	
+	// Setter and getter methods
+	// ...
+}
+
+You can create instances of the Product class from your application (for example, from a
+database). The generated class product.xml.ObjectFactory contains a method that allows you
+to convert these objects to JAXB elements that can be returned as XML inside JAX-RS resource
+methods:
+
+@XmlElementDecl(namespace = "http://xml.product", name = "product")
+public JAXBElement<Product> createProduct(Product value) {
+	return new JAXBElement<Product>(_Product_QNAME, Product.class, null, value);
+}
+
+The following code shows how to use the generated classes to return a JAXB element as XML in
+a JAX-RS resource method:
+
+@Path("/product")
+public class ProductService {
+
+	@GET
+	@Path("/get")
+	@Produces("application/xml")
+	public JAXBElement<Product> getProduct() {
+		Product prod = new Product();
+		prod.setId(1);
+		prod.setName("Mattress");
+		prod.setDescription("Queen size mattress");
+		prod.setPrice(500);
+		return new ObjectFactory().createProduct(prod);
+	}
+}
+
+For @POST and @PUT resource methods, you can use a Product object directly as a parameter.
+JAX-RS maps the XML data from the request into a Product object.
+
+@Path("/product")
+public class ProductService {
+
+	@GET
+	// ...
+	
+	@POST
+	@Path("/create")
+	@Consumes("application/xml")
+	public Response createProduct(Product prod) {
+		// Process or store the product and return a response
+		// ...
+	}
+}
+
+Using JSON with JAX-RS and JAXB
+-------------------------------
+JAX-RS can automatically read and write XML using JAXB, but it can also work with JSON
+data. JSON is a simple text-based format for data exchange derived from JavaScript. For the
+examples above, the XML representation of a product is:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<product>
+<id>1</id>
+<name>Mattress</name>
+<description>Queen size mattress</description>
+<price>500</price>
+</product>
+
+The equivalent JSON representation is:
+
+{
+"id":"1",
+"name":"Mattress",
+"description":"Queen size mattress",
+"price":500
+}
+
+You can add the format application/json to the @Produces annotation in resource methods
+to produce responses with JSON data:
+
+@GET
+@Path("/get")
+@Produces({"application/xml","application/json"})
+public Product getProduct() { ... }
+
+In this example the default response is XML, but the response is a JSON object if the client
+makes a GET request that includes this header:
+Accept: application/json
+
+The resource methods can also accept JSON data for JAXB annotated classes:
+
+@POST
+@Path("/create")
+@Consumes({"application/xml","application/json"})
+public Response createProduct(Product prod) { ... }
+
+The client should include the following header when submitting JSON data with a POST request:
+Content-Type: application/json
+
+
+page 418 (Example Application)
 
 
 //guias de primera implemenetacion
