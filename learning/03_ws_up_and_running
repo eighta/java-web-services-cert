@@ -161,8 +161,92 @@ troubleshooting because services reduce to primitive function calls. An SOA syst
 be quite complicated, of course, but the complication arises from the composition and
 not from the simple services into which the system ultimately decomposes.
 
+Web services are well suited as components in an SOA system. Following best practices,
+a web service should consist of operations, each of which is implemented as a stateless
+function call: the call is stateless in that the return value(s) depend only on the arguments
+passed to the call. In an object-oriented language such as a Java, a well-designed web
+service is a class that has instance methods as service operations but no instance fields
+that impact the value returned from a particular method. In practice, statelessness is
+easier said than done, as the many examples in this book illustrate. In the context of
+SOA, it is common to distinguish between providers and consumers of web services: the
+provider furnishes the service’s functionality, and the consumer is a client that issues
+requests against the service’s operations. The provider/consumer pair is commonly used
+to describe web services and their clients, respectively.
+
+Perhaps the best way to clarify SOA in the concrete is to contrast this approach to
+distributed systems with a quite different approach: DOA (Distributed Object Archi‐
+tecture). Web services came to fore as a reaction against the complexity of DOA systems.
+The next section provides a short history of web services, with emphasis on the kinds
+of software challenges that web services are meant to address.
+
+A Very Short History of Web Services
+Web services evolved from the RPC (Remote Procedure Call) mechanism in DCE (Dis‐
+tributed Computing Environment), a framework for software development from the
+early 1990s. DCE includes a distributed filesystem (DCE/DFS) and a Kerberos-based
+authentication system. Although DCE has its origins in the Unix world, Microsoft
+quickly did its own implementation known as MSRPC, which in turn served as the
+infrastructure for interprocess communication in Windows. Microsoft’s COM/OLE
+(Common Object Model/Object Linking and Embedding) technologies and services
+were built on a DCE/RPC foundation. There is irony here. DCE designed RPC as a way
+to do distributed computing (i.e., computing across distinct physical devices), and Mi‐
+crosoft cleverly adapted RPC to support interprocess communication, in the form of
+COM infrastructure, on a single device—a PC running Windows.
+
+The first-generation frameworks for distributed object systems, CORBA (Common
+Object Request Broker Architecture) and Microsoft’s DCOM (Distributed COM), are
+anchored in the DCE/RPC procedural framework. Java RMI (Remote Method Invoca‐
+tion) also derives from DCE/RPC, and the method calls in Java EE (Enterprise Edition),
+specifically in Session and Entity EJBs (Enterprise Java Bean), are Java RMI calls. Java
+EE (formerly J2EE) and Microsoft’s DotNet are second-generation frameworks for dis‐
+tributed object systems, and these frameworks, like CORBA and DCOM before them,
+trace their ancestry back to DCE/RPC. By the way, DCE/RPC is not dead. Various
+popular system utilities (for instance, the Samba file and print service for Windows
+clients) use DCE/RPC.
+
+From DCE/RPC to XML-RPC
+DCE/RPC has the familiar client/server architecture in which a client invokes a proce‐
+dure that executes on the server. Arguments can be passed from the client to the server
+and return values can be passed from the server to the client. The framework is platform-
+and language- neutral in principle, although strongly tilted toward C in practice. DCE/
+RPC includes utilities for generating client and server artifacts (stubs and skeletons,
+respectively). DCE/RPC also provides software libraries that hide the transport details.
+Of interest now is the IDL (Interface Definition Language) document that acts as the
+service contract and is an input to utilities that generate artifacts in support of the DCE/
+RPC calls. An IDL document can be short and to the point
+
+/* echo.idl */
+[uuid(2d6ead46-05e3-11ca-7dd1-426909beabcd), version(1.0)]
+interface echo {
+	const long int ECHO_SIZE = 512;
+
+	void echo(
+				[in]			handle_t h,
+				[in, string]	idl_char from_client[],
+				[out, string]	idl_char from_server[ECHO_SIZE]
+	);
+}
+
+The IDL interface named echo , identified with a machine-generated UUID (Universally
+Unique IDentifier), declares a single function with the same name, echo . The names are
+arbitrary and need not be the same. The echo function expects three arguments, two of
+which are in parameters (that is, inputs into the remote procedure) and one of which
+is an out parameter (that is, an output from the remote procedure). The first argument,
+of built-in type handle_t , is required and points to an RPC data structure. The function
+echo could but does not return a value, because the echoed string is returned instead as
+an out parameter. The IDL specifies the invocation syntax for the echo function, which
+is the one and only operation in the service. Except for annotations in square brackets
+to the left of the three echo parameters, the syntax of the IDL is essentially C syntax.
+The IDL document is a precursor of the WSDL (Web Service Description Language)
+document that provides a formal specification of a web service and its operations.
+
+There is a Microsoft twist to the IDL story as well. An ActiveX control under Windows
+is a DLL (Dynamic Link Library) with an embedded typelib, which in turn is a compiled
+IDL file. For example, suppose that a calendar ActiveX control is plugged into a browser.
+The browser can read the typelib, which contains the invocation syntax for each oper‐
+ation (e.g., displaying the next month) in the control. An ActiveX control is thus a chunk
+of software that embeds its own interface. This is yet another inspired local use of a
+technology designed for distributed computing.
 
 
 
-
-pag 8
+pag 10
