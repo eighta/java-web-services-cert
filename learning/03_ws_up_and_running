@@ -56,5 +56,113 @@ and SOAP is officially no longer an acronym.
 
 Web Service Miscellany
 ----------------------
+Except in test mode, the client of either a SOAP-based or REST-style service is rarely a
+web browser but, rather, usually an application without a graphical user interface. The
+client may be written in any language with the appropriate support libraries. Indeed, a
+major appeal of web services is language transparency: the service and its clients need
+not be written in the same language. Language transparency is a key contributor to web
+service interoperability—that is, the ability of web services and their consumers to in‐
+teract seamlessly despite differences in programming languages, support libraries, op‐
+erating systems, and hardware platforms.
 
-pag 3
+There is no magic in language transparency, of course. If a web service written in Java
+can have a Python or a Ruby consumer, there must be an intermediary layer that handles
+the differences in data types between the service and the client languages. XML tech‐
+nologies, which support structured document interchange and processing, act as one
+such intermediary level. Another intermediary level is JSON (JavaScript Object Nota‐
+tion). XML and JSON are both data-interchange formats, but JSON clearly has the upper
+hand with data receivers written in JavaScript because a JSON document is the text
+representation of a native JavaScript object. Web service clients are increasingly Java‐
+Script programs embedded in HTML documents and executing in a browser; such
+clients process JSON with less fuss than they do XML. Even among non-JavaScript
+clients, JSON has gained in popularity; for one thing, JSON is more readable than XML
+because JSON has relatively less markup.
+
+Several features distinguish web services from other distributed software systems. Here
+are three:
+
+Open infrastructure
+Web services are deployed using industry-standard, vendor-independent protocols
+and languages such as HTTP, XML, and JSON, all of which are ubiquitous and well
+understood. Web services can piggyback on networking, data formatting, security,
+and other infrastructures already in place, which lowers entry costs and promotes
+interoperability among services. Organizations that publish websites with
+production-grade web servers such as Apache2, IIS, and Nginx can publish web
+services with these very web servers. Firewalls and other security mechanisms that
+defend websites thereby defend web services as well.
+
+Platform and language transparency
+Web services and their clients can interoperate even if written in different pro‐
+gramming languages. Languages such as C, C#, Go, Java, JavaScript, Perl, Python,
+Ruby, and others provide libraries, utilities, and even frameworks in support of web
+services. Web services can be published and consumed on various hardware plat‐
+forms and under different operating systems. Web services are an excellent way to
+integrate diverse software systems while allowing the programmer to work in the
+programmer’s language of choice. The web service approach to software develop‐
+ment is not to rewrite but, rather, to integrate.
+
+Modular design
+Web services are meant to be modular in design so that new services can be com‐
+posed out of existing ones. Imagine, for example, an inventory-tracking service
+integrated with an online ordering service to compose a service that automatically
+orders the appropriate products in response to inventory levels. Web services are
+the small software parts out of which arbitrarily large systems can be built. A guiding
+principle in web service design is to begin with very simple service operations,
+essentially uncomplicated functions, and then group these operations into services,
+which in turn can be orchestrated to work with other services, and so on indefinitely.
+
+As noted earlier, web services come in different flavors: SOAP-based and REST-style.
+SOAP and SOA, though related, remain distinct. The next section goes into detail about
+the relationship between SOA and REST-style and SOAP-based web services.
+
+Web Services and Service-Oriented Architecture
+----------------------------------------------
+
+Web services and SOA are related but distinct. SOA, like REST, is more an architectural
+style—indeed, a mindset—than a body of precisely defined rules for the design and
+implementation of distributed systems; web services are a natural, important way to
+provide the services at the core of any SOA system. A fundamental idea in SOA is that
+an application results from integrating network-accessible services, which are intero‐
+perable because each has an interface that clearly defines the operations encapsulated
+in the service. Per operation, the interface specifies the number and type of each argu‐
+ment passed to the service operation together with the number and type of values re‐
+turned from each service operation. The very point of a service interface is to publish
+the invocation syntax of each operation encapsulated in the service. One attraction of
+the SOA approach is that the ultimate building blocks of even large, complicated systems
+are structurally simple components; this simplicity at the base level makes it relatively
+easy to test, debug, deploy, extend, and otherwise maintain a software system.
+
+In an SOA system, services as building block components may be characterized as
+unassociated and loosely coupled. Consider, for example, two primitive services, S 1 and
+S 2 , in an SOA application. The two services are unassociated in that neither S 1 nor S 2
+depends on the other: S 1 is not required to use S 2 or vice versa. The services are mutually
+independent but can be used together or orchestrated as parts of a larger software sys‐
+tem. Following the same theme, components such as S 1 and S 2 are loosely coupled in
+that neither needs to know anything about the internal structure of the other in order
+for both of these services to work together as parts of a larger distributed system. A
+persistent theme in the many discussions of SOA is the modularity of SOA-based
+systems.
+
+At the implementation level, a service operation is a function call: the function takes
+zero or more arguments and returns zero or more values. Although functions in many
+languages such as C and even Java technically return, at most, only a single value and
+therefore must resort to aggregate data structures such as a lists to return multiple values,
+newer languages such as Go have uncomplicated syntax for functions to return arbi‐
+trarily many values including, of course, none. This fact underscores the inherent rich‐
+ness and flexibility of the function as a system building block. Programmers fluent in
+virtually any language are thereby knowledgeable about the syntax and semantics of
+functions.
+
+In an SOA system, a very simple service may consist of a single function. The imple‐
+mentation model is thus uncomplicated and familiar to programmers, and the simplicity
+of service operations promotes code reuse through the composition of new services out
+of existing ones. This ground-level simplicity also enables relatively straightforward
+troubleshooting because services reduce to primitive function calls. An SOA system can
+be quite complicated, of course, but the complication arises from the composition and
+not from the simple services into which the system ultimately decomposes.
+
+
+
+
+
+pag 8
