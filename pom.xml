@@ -17,6 +17,13 @@
 	<!-- DEPENDENCIES -->
 	<dependencies>
 
+		<!-- JUNIT -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+		</dependency>
+
 		<!-- JAX-WS -->
 		<dependency>
 			<groupId>javax.xml.ws</groupId>
@@ -42,22 +49,22 @@
 		<!-- SHIP IN JAVA EE -->
 		<!-- Jersey: JAX-RS (JSR 311 & JSR 339) Reference Implementation -->
 		<dependency>
-		    <groupId>org.glassfish.jersey.containers</groupId>
-		    <artifactId>jersey-container-servlet</artifactId>
-		    <version>2.24</version>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet</artifactId>
+			<version>2.24</version>
 		</dependency>
-		
+
 		<dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${jersey2.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${jersey2.version}</version>
-        </dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>${jersey2.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>${jersey2.version}</version>
+		</dependency>
 
 	</dependencies>
 
