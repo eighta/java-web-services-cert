@@ -247,6 +247,193 @@ ation (e.g., displaying the next month) in the control. An ActiveX control is th
 of software that embeds its own interface. This is yet another inspired local use of a
 technology designed for distributed computing.
 
+In the late 1990s, Dave Winer of UserLand Software developed XML-RPC, a technology
+innovation that has as good a claim as any to mark the birth of web services. XML-RPC
+is a very lightweight RPC system with support for elementary data types (basically, the
+built-in C types together with a boolean and a datetime type) and a few simple com‐
+mands. The original specification is about seven pages in length. The two key features
+are the use of XML marshaling/unmarshaling to achieve language neutrality and reli‐
+ance on HTTP (and, later, SMTP) for transport. The term marshaling refers to the
+conversion of an in-memory object (for instance, an Employee object in Java) to some
+other format (for instance, an XML document); unmarshaling refers to the inverse pro‐
+cess of generating an in-memory object from, in this example, an XML document. The
+marshal/unmarshal distinction is somewhere between close to and identical with the
+serialize/deserialize distinction. My habit is to use the distinctions interchangeably. In
+any case, the O’Reilly open-wire Meerkat service and the WordPress publishing plat‐
+form are based on XML-RPC.
+
+Two key differences separate XML-RPC, on the one side, from DCE/RPC and its off-
+shoots, on the other side:
+
+- XML-RPC payloads are text, whereas DCE/RPC payloads are binary. Text is rela‐
+tively easy to inspect and process with standard, readily available tools such as
+editors and parsers.
+- XML-RPC transport uses HTTP rather than a proprietary system. To support XML-
+RPC, a programming language requires only a standard HTTP library together
+with libraries to generate, parse, transform, and otherwise process XML.
+
+As an RPC technology, XML-RPC supports the request/response pattern. Here is the
+XML request to invoke, on a remote machine, the Fibonacci function with an argument
+of 11. This argument is passed as a 4-byte integer, as the XML start tag <i4> indicates:
+
+<?xml version="1.0">
+<methodCall>
+	<methodName>fib<methodName>
+
+	<params>
+		<param>
+			<value>
+				<i4>11</i4>
+			</value>
+		</param>
+	</params>
+</methodCall>
+
+The integer 11 occurs in the XML-RPC message as text. An XML-RPC library on the
+receiving end needs to extract 11 as text and then convert the text into a 4-byte integer
+in the receiving language such as Go or Java. Even this short example illustrates the idea
+of having XML—in particular, data types expressed in XML—serve as the leveling
+mechanism between two different languages involved in an XML-RPC exchange.
+
+XML-RPC is deliberately low fuss and lightweight. SOAP, an XML dialect derived
+straight from XML-RPC, is considerably heavier in weight. From inception, XML-RPC
+faced competition from second-generation DOA systems such as Java EE (J2EE) and
+AspNet. The next section considers the challenges inherent in DOA systems. These
+challenges sustained and eventually intensified interest in lighter-weight approaches to
+distributed computing—modern web services.
+
+Distributed Object Architecture: A Java Example
+-----------------------------------------------
+What advantages do web services have over DOA technologies such as Java RMI? This
+section addresses the question with an example. Java RMI (including the Session and
+Entity EJB constructs built on Java RMI) and DotNet Remoting are examples of second-
+generation distributed object systems. Consider what a Java RMI client requires in order
+to invoke a method declared in a service interface such as this:
+
+import java.util.List;
+public interface BenefitsService extends java.rmi.Remote {
+	public List<Benefit> getBenefits(Emp emp) throws RemoteException;
+}
+
+The interface appears deceptively simple in that it declares only the method named
+getBenefits , yet the interface likewise hints at what makes a Distributed Object Ar‐
+chitecture so tricky. A client against this BenefitsService requires a Java RMI stub, an
+instance of a class that implements the BenefitsService interface. The stub is down‐
+loaded automatically from the server to the client as part of the Java RMI setup
+
+Once the stub setup is done, the getBenefits method is executed as a stub method;
+that is, the stub acts as the client-side object making a remote method call through one
+of stub’s encapsulated methods. The call thus has the following syntax:
+
+Emp fred = new Emp();
+//...
+List<Benefit> benefits = rmiStub.getBenefits(fred); // rmiStub = reference
+
+Invoking the getBenefits method requires that the byte codes for various Java classes,
+standard and programmer-defined, be available on the client machine. To begin, the
+client needs the class Emp , the argument type for the getBenefits method, and the class
+Benefit , the member type for the List that the method getBenefits returns. Suppose
+that the class Emp begins like this:
+
+public class Emp {
+	private Department
+	department;
+	private List<BusinessCertification> certifications;
+	private List<ClientAccount>
+	accounts;
+	private Map<String, Contact>
+	contacts;
+	...
+}
+
+The standard Java types such as List and Map are already available on the client side
+because the client is, by assumption, a Java application. The challenge involves the ad‐
+ditional, programmer-defined types such as Department , BusinessCertification ,
+ClientAccount , and Contact that are needed to support the client-side invocation of a
+remotely executed method. The setup on the client side to enable a remote call such as:
+
+Emp fred = new Emp();
+// set properties, etc.
+List<EmpBenefits> fredBenefits = rmiStub.getBenefits(fred);	
+
+is significant, with lots and lots of bytes required to move from the server down to the
+client just for the setup. Anything this complicated is, of course, prone to problems such
+as versioning issues and outright errors in the remote method calls.
+
+Java RMI uses proprietary marshaling/unmarshaling and proprietary transport, and
+DotNet does the same. There are third-party libraries for interoperability between the
+two frameworks. Yet a Java RMI service can be expected to have mostly Java clients, and
+a DotNet Remoting service can be expected to have mostly DotNet clients. Web services
+represent a move toward standardization, simplicity, and interoperability.
+
+Web Services to the Rescue
+--------------------------
+Web services simplify matters in distributed computing. For one thing, the client and
+service typically exchange XML or equivalent documents, that is, text. If needed, non-
+text bytes can be exchanged instead, but the preferred payloads are text. The exchanged
+text can be inspected, validated, transformed, persisted, and otherwise processed using
+readily available, nonproprietary, and often free tools. Each side, client and service,
+simply needs a local software library that binds language-specific types such as the Java
+String to XML Schema or comparable types, in this case xsd:string . (In the qualified
+name xsd:string , xsd is a namespace abbreviation and string is a local name. Of
+interest here is that xsd:string is an XML type rather than a Java type.) Given these
+Java/XML bindings, relatively uncomplicated library modules can convert from one to
+the other—from Java to XML or from XML to Java
+
+Processing on the client side, as on the service side, requires only locally available li‐
+braries and utilities. The complexities, therefore, can be isolated at the endpoints—the
+service and the client applications together with their supporting libraries—and need
+not seep into the exchanged messages. Finally, web services are available over HTTP, a
+nonpropriety protocol that has become standard, ubiquitous infrastructure; HTTP in
+particular comes with a security extension, HTTPS, that provides multifaceted security
+services.
+
+In a web service, the requesting client and the service need not be coded in the same
+language or even in the same style of language. Clients and services can be implemented
+in object-oriented, procedural, functional, and other language styles. The languages on
+either end may be statically typed (for instance, Java and Go) or dynamically typed (for
+example, JavaScript and Ruby). The complexities of stubs and skeletons, the serializing
+and deserializing of objects encoded in some proprietary format, give way to relatively
+simple text-based representations of messages exchanged over standard transports such
+as HTTP. The messages themselves are neutral; they have no bias toward a particular
+language or even family of languages.
+
+What Is REST?
+
+Roy Fielding coined the acronym REST in his PhD dissertation. Chapter 5 of Fielding’s
+dissertation lays out the guiding principles for what have come to be known as REST-
+style or RESTful web services. Fielding has an impressive résumé. He is, among other
+things, a principal author of the HTTP 1.1 specification and a cofounder of the Apache
+Software Foundation.
+
+REST and SOAP are quite different. SOAP is a messaging protocol in which the messages
+are XML documents, whereas REST is a style of software architecture for distributed
+hypermedia systems, or systems in which text, graphics, audio, and other media are
+stored across a network and interconnected through hyperlinks. The World Wide Web
+is the obvious example of such a system. As the focus here is on web services, the World
+Wide Web is the distributed hypermedia system of interest. In the Web, HTTP is both
+a transport protocol and a messaging system because HTTP requests and responses are
+messages. The payloads of HTTP messages can be typed using the MIME (Multipurpose
+Internet Mail Extension) type system. MIME has types such as text/html , applica
+tion/octet-stream , and audio/mpeg3 . HTTP also provides response status codes to
+inform the requester about whether a request succeeded and, if not, why. next Table lists
+some common status codes.
+
+Status 	code In English		Meaning
+200 	OK	Request 		OK
+303 	See Other			Redirect
+400 	Bad Request			Request malformed
+401 	Unauthorized		Authentication error
+403 	Forbidden			Request refused
+404 	Not Found			Resource not found
+405 	Method Not Allowed	Method not supported
+415 	Unsupported Media 	Type Content type not recognized
+500 	Internal Server Error	Request processing failed
 
 
-pag 10
+
+
+
+
+
+pag 14
