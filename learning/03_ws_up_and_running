@@ -696,11 +696,10 @@ hence, the request data, if any, is sent as query string key/value pairs.
 The decision about whether to be RESTful in a particular application depends, as always,
 on practical matters that will come to the fore throughout this book. The current section
 looked at REST from on high; it is now time to descend into details with code examples.
-The next section summarizes the overview of HTTP with two Java clients. A first REST‐
-ful service follows.
+The next section summarizes the overview of HTTP with two Java clients. A first RESTful service follows.
+
+A First RESTful Example
+-----------------------
 
 
-
-
-
-pag 23
+pag 24
