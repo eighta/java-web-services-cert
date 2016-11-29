@@ -8,10 +8,15 @@ In this approach, the service interface is created first and the implementation 
 2. Bottom-up approach
 In this approach, the service implementation is created first, and based on that the interface is defined. This approach is easy to for beginners who are new to web services.
 
+Java Specification Request (JSRs)
+=================================
 
 JSR 224:	Java API for XML Web Services 		(JAX-WS)
 JSR 311:	Java API for RESTful Web Services 	(JAX-RS 1.0) date 2008
 JSR 339: 	Java API for RESTful Web Services 	(JAX-RS 2.0) date 2013
+JSR 31:		Java Architecture for XML Binding	(JAXB 1.0) date 2003
+JSR 222:	Java Architecture for XML Binding	(JAXB 2.0) date 2006
+
 
 Before the JAX-RS specification there were frameworks like Restlet and RestEasy that 
 could help you implement the RESTful Web services, but they were not intuitive. 
@@ -22,4 +27,33 @@ Jersey is the reference implementation for JAX-RS, and it contains three major p
 -Core Client: The Jersey client API helps you to easily communicate with REST services.
 -Integration: Jersey also provides libraries that can easily integrate with Spring, Guice, Apache Abdera, and so on.
 
+--
 
+Marshalling
+(https://en.wikipedia.org/wiki/Marshalling_%28computer_science%29)
+In computer science, marshalling or marshaling is the process of transforming the 
+memory representation of an object to a data format suitable for storage or transmission, 
+and it is typically used when data must be moved between different parts of a computer program 
+or from one program to another.
+
+Unmarshalling
+https://en.wikipedia.org/wiki/Unmarshalling
+In computer science, unmarshalling or unmarshaling refers to the process of transforming 
+a representation of an object that was used for storage or transmission to a representation 
+of the object that is executable. A serialized object which was used for communication can not be 
+processed by a computer program. An unmarshalling interface takes the serialized object and transforms 
+it into an executable form. Unmarshalling (similar to deserialization) is the reverse process of marshalling.
+
+Parsing
+https://en.wikipedia.org/wiki/Parsing
+https://en.wikipedia.org/wiki/Parsing#Computer_languages
+
+Serialization
+https://en.wikipedia.org/wiki/Serialization
+In computer science, in the context of data storage, serialization is the process of translating 
+data structures or object state into a format that can be stored (for example, in a file or memory buffer, 
+or transmitted across a network connection link) and reconstructed later in the same or another computer environment. 
+When the resulting series of bits is reread according to the serialization format, it can be used to create a semantically 
+identical clone of the original object. For many complex objects, such as those that make extensive use of references, 
+this process is not straightforward. Serialization of object-oriented objects does not include any of their associated methods 
+with which they were previously inextricably linked.
